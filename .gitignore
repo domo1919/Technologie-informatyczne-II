@@ -1,0 +1,13 @@
+.vscode/*
+
+**/.idea/
+**/cmake-build-debug/
+
+**/build/
+
+*.log
+*.tmp
+
+**/.env
+
+!.vscode/settings.json
