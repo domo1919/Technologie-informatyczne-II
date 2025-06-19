@@ -2,97 +2,103 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_SAMOCHODY 100
-#define DLUGOSC 50
+#define MAX_CARS 100
+#define TEXT_LENGTH 50
 
+// Struktura przechowująca dane o samochodzie
 typedef struct {
-    char marka[DLUGOSC];
-    char model[DLUGOSC];
-    int przebieg;
-} Samochod;
+    char brand[TEXT_LENGTH];
+    char model[TEXT_LENGTH];
+    int mileage;
+} Car;
 
-Samochod samochody[MAX_SAMOCHODY];
-int liczba_samochodow = 0;
+Car cars[MAX_CARS];
+int carCount = 0;
 
-void dodajSamochod() {
-    if (liczba_samochodow >= MAX_SAMOCHODY) {
+// Dodawanie nowego samochodu przez użytkownika
+void addCar() {
+    if (carCount >= MAX_CARS) {
         printf("Osiągnięto maksymalną liczbę samochodów.\n");
         return;
     }
 
     printf("Podaj marke samochodu: ");
-    scanf("%s", samochody[liczba_samochodow].marka);
+    scanf("%s", cars[carCount].brand);
 
     printf("Podaj model samochodu: ");
-    scanf("%s", samochody[liczba_samochodow].model);
+    scanf("%s", cars[carCount].model);
 
     printf("Podaj przebieg samochodu: ");
-    scanf("%d", &samochody[liczba_samochodow].przebieg);
+    scanf("%d", &cars[carCount].mileage);
 
-    liczba_samochodow++;
+    carCount++;
     printf("Samochod dodany pomyślnie.\n");
 }
 
-void wyswietlSamochody() {
-    if (liczba_samochodow == 0) {
+// Wyświetlanie wszystkich zapisanych samochodów
+void showCars() {
+    if (carCount == 0) {
         printf("Brak zapisanych samochodów.\n");
         return;
     }
 
     printf("\nLista samochodów:\n");
-    for (int i = 0; i < liczba_samochodow; i++) {
+    for (int i = 0; i < carCount; i++) {
         printf("%d. Marka: %s, Model: %s, Przebieg: %d km\n",
                i + 1,
-               samochody[i].marka,
-               samochody[i].model,
-               samochody[i].przebieg);
+               cars[i].brand,
+               cars[i].model,
+               cars[i].mileage);
     }
 }
 
-void zapiszDoPliku(const char *nazwaPliku) {
-    FILE *plik = fopen(nazwaPliku, "w");
-    if (plik == NULL) {
+// Zapis danych do pliku tekstowego
+void saveToFile(const char *filename) {
+    FILE *file = fopen(filename, "w");
+    if (file == NULL) {
         printf("Blad przy zapisie do pliku.\n");
         return;
     }
 
-    for (int i = 0; i < liczba_samochodow; i++) {
-        fprintf(plik, "%s %s %d\n",
-                samochody[i].marka,
-                samochody[i].model,
-                samochody[i].przebieg);
+    for (int i = 0; i < carCount; i++) {
+        fprintf(file, "%s %s %d\n",
+                cars[i].brand,
+                cars[i].model,
+                cars[i].mileage);
     }
 
-    fclose(plik);
-    printf("Dane zapisane do pliku \"%s\".\n", nazwaPliku);
+    fclose(file);
+    printf("Dane zapisane do pliku \"%s\".\n", filename);
 }
 
-void wczytajZPliku(const char *nazwaPliku) {
-    FILE *plik = fopen(nazwaPliku, "r");
-    if (plik == NULL) {
-        printf("Nie mozna otworzyc pliku \"%s\".\n", nazwaPliku);
+// Wczytanie danych z pliku tekstowego
+void loadFromFile(const char *filename) {
+    FILE *file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("Nie mozna otworzyc pliku \"%s\".\n", filename);
         return;
     }
 
-    liczba_samochodow = 0;
+    carCount = 0;
 
-    while (fscanf(plik, "%s %s %d",
-                  samochody[liczba_samochodow].marka,
-                  samochody[liczba_samochodow].model,
-                  &samochody[liczba_samochodow].przebieg) == 3) {
-        liczba_samochodow++;
-        if (liczba_samochodow >= MAX_SAMOCHODY) {
+    while (fscanf(file, "%s %s %d",
+                  cars[carCount].brand,
+                  cars[carCount].model,
+                  &cars[carCount].mileage) == 3) {
+        carCount++;
+        if (carCount >= MAX_CARS) {
             break;
         }
     }
 
-    fclose(plik);
-    printf("Dane wczytane z pliku \"%s\".\n", nazwaPliku);
+    fclose(file);
+    printf("Dane wczytane z pliku \"%s\".\n", filename);
 }
 
+// Funkcja główna – menu użytkownika
 int main() {
-    int wybor;
-    char nazwaPliku[] = "samochody.txt";
+    int choice;
+    char filename[] = "samochody.txt";
 
     do {
         printf("\n--- MENU ---\n");
@@ -102,20 +108,20 @@ int main() {
         printf("4. Wczytaj z pliku\n");
         printf("5. Wyjscie\n");
         printf("Wybierz opcje: ");
-        scanf("%d", &wybor);
+        scanf("%d", &choice);
 
-        switch (wybor) {
+        switch (choice) {
             case 1:
-                dodajSamochod();
+                addCar();
                 break;
             case 2:
-                wyswietlSamochody();
+                showCars();
                 break;
             case 3:
-                zapiszDoPliku(nazwaPliku);
+                saveToFile(filename);
                 break;
             case 4:
-                wczytajZPliku(nazwaPliku);
+                loadFromFile(filename);
                 break;
             case 5:
                 printf("Zamykanie programu...\n");
@@ -123,7 +129,7 @@ int main() {
             default:
                 printf("Nieprawidłowy wybor.\n");
         }
-    } while (wybor != 5);
+    } while (choice != 5);
 
     return 0;
 }
